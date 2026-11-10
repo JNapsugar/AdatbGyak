@@ -1,0 +1,22 @@
+5. Feladat
+
+1. Vedd fel a resztvevo táblába egy új diákot a következő adatokkal: TAJ-szám: '123456789', Név: 'Nagy Péter', Lakcím: 'Miskolc, Fő utca 1.'! 
+INSERT INTO resztvevo (tajszam, nev, lakcim)
+VALUES ('123456789', 'Nagy Péter', 'Miskolc, Fő utca 1.');
+
+2. Töröld a tanfolyam táblából azokat a képzéseket, amelyek ára olcsóbb, mint 10 000 Ft! 
+DELETE FROM tanfolyam
+WHERE ar < 10000;
+
+3. Frissítsd a tanfolyam táblában a 'Nyelv' típusú kurzusok árát úgy, hogy 20%-kal drágábbak legyenek!
+UPDATE tanfolyam
+SET ar = ar * 1.2
+WHERE tipus = 'Nyelv';
+
+
+6. Feladat
+-Azon rekordok megszüntetése, ahol nincs kitöltve a kategória (IS NULL)
+DELETE FROM termekek
+WHERE kategoria IS NULL;
+
+

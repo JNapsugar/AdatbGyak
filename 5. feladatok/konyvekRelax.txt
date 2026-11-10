@@ -1,0 +1,44 @@
+1. A 'Horror' műfajú könyvek címe és ára.
+π cim, ar(σ mufaj='Horror'(konyv))
+
+2. A könyvek címe és a hozzájuk tartozó szerző neve együtt.
+π cim, nev (konyv ⨝ szerzo = szkod szerzo)
+
+3. A 'brit' nemzetiségű szerzők könyveinek címei.
+π cim (konyv ⨝ szerzo = szkod (σ nemzetiseg = 'brit' (szerzo)))
+
+4. Hány darab 'Fantasy' műfajú könyv található az adatbázisban? 
+γ count(kkod)->db (σ mufaj = 'Fantasy' (konyv))
+
+5. Add meg a legolcsóbb könyv címét és árát!
+legkisebb_ar = γ min(ar)->min_ar (konyv)
+π cim, ar (konyv ⨝ ar = min_ar legkisebb_ar)
+
+6. Melyik a legdrágább könyv? Adja meg a könyv minden adatát! 
+legnagyobb_ar = γ max(ar)->max_ar (konyv)
+konyv ⨝ ar = max_ar legnagyobb_ar
+
+7. Listázd ki a 2000-nél drágább könyvek címét és a kiadójuk nevét! 
+π cim, nev ((σ ar > 2000 (konyv)) ⨝ szerzo = szkod szerzo)
+
+8. Mennyi a könyvek átlagos ára műfajonként? Add meg a műfajt és az átlagárat! 
+γ mufaj; avg(ar)->atlag_ar (konyv)
+
+9. Mennyi a könyvek összértéke (árak összege) szerzőnként? Add meg a szerző nevét és az árak összegét! 
+γ nev; sum(ar)->osszertek (konyv ⨝ szerzo = szkod szerzo)
+
+10. Írd ki azoknak a könyveknek a címét, amelyek ára meghaladja az átlagos könyvárat!
+atlagos = γ avg(ar)->atlag_ar (konyv)
+π cim (σ ar > atlag_ar (konyv ⨯ atlagos))
+
+11. Melyik szerzőhöz mennyi könyv tartozik? Add meg a szerző nevét és a könyvei darabszámát!
+γ nev; count(kkod)->konyvek_szama (szerzo ⟕ szkod = szerzo konyv)
+ 
+12. A 'Fantasy' műfajú könyveknél drágább könyvek darabszáma. (Tipp: vedd figyelembe a Fantasy könyvek maximális árát!)
+max_fantasy = γ max(ar)->max_f_ar (σ mufaj = 'Fantasy' (konyv))
+γ count(kkod)->db (σ ar > max_f_ar (konyv ⨯ max_fantasy))
+
+13. A 'Fantasy' műfajú könyveknél drágább könyvek szerzőinek darabszáma.
+max_fantasy = γ max(ar)->max_f_ar (σ mufaj = 'Fantasy' (konyv))
+dragabb_szerzok = π szerzo (σ ar > max_f_ar (konyv ⨯ max_fantasy))
+γ count(szerzo)->szerzok_szama (dragabb_szerzok)
