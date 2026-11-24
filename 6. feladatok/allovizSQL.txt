@@ -1,0 +1,81 @@
+1. Melyek azok a tavak (név, típus), amelyek „morotvató” típusúak?
+SELECT nev, tipus FROM alloviz WHERE tipus = 'morotvató';
+
+2. Listázd ki azoknak a tavaknak a nevét,  amelyeknek a vízgyűjtő területe() nagyobb, mint 100! 
+SELECT nev FROM alloviz WHERE vizgyujto>100;
+
+3. Határozza meg a „bányató” típusú tavak átlagos területét! A mező cimkéje “átlagos terület” legyen! 
+SELECT AVG(terulet) AS "átlagos terület" FROM alloviz WHERE tipus='bányató';
+
+4. Melyik település látható a telepulesgps táblában a 382-es azonosítóval (id)? 
+SELECT nev FROM telepulesgps WHERE id=382;
+
+5.  Keressük meg azokat a településeket, amelyeknekn a neve „S” betűvel kezdődik! 
+SELECT nev FROM telepulesgps WHERE nev LIKE 'S%';
+
+6. Írasd ki az alloviz táblából az összes különböző (egyedi) tó típust!  (distinct )
+SELECT DISTINCT tipus FROM alloviz;
+
+7. Listázd ki a Balaton mellett fekvő települések nevét!
+SELECT t.nev FROM alloviz a
+INNER JOIN helykapcs h ON a.id = h.allovizid
+INNER JOIN telepulesgps t ON h.gpsid = t.id
+WHERE a.nev = 'Balaton';
+
+8. Állóvizenként hány db település van? (Állóvíznév, db)
+SELECT a.nev AS "Állóvíznév", COUNT(h.gpsid) AS db FROM alloviz a
+INNER JOIN helykapcs h ON a.id = h.allovizid
+GROUP BY a.id, a.nev;
+
+9. Mely állóvíznél van a legtöbb település?
+SELECT a.nev, COUNT(h.gpsid) AS db FROM alloviz a
+INNER JOIN helykapcs h ON a.id = h.allovizid
+GROUP BY a.id, a.nev ORDER BY db DESC
+FETCH FIRST 1 ROWS ONLY;
+
+
+10. A néhány km2 területű és állandó vízbázisú (nagy vízgyűjtő területű) tavakat közepes nagyságúaknak nevezzük. Lekérdezés segítségével adja meg azoknak a tavaknak a nevét, kialakulás típusát és területét, amelyek területe legalább 3 és legfeljebb 10 km2, valamint a vízgyűjtő területük saját területüknél legalább 10-szer nagyobb!
+SELECT nev, tipus, terulet FROM alloviz 
+WHERE terulet BETWEEN 3 AND 10 AND vizgyujto >= terulet * 10;
+
+
+11. Listázza ki a tavak nevét és a hozzájuk kapcsolódó települések nevét! A tavak neve abc-sorrendben.
+SELECT a.nev AS to_nev, t.nev AS telepules_nev FROM alloviz a
+INNER JOIN helykapcs h ON a.id = h.allovizid
+INNER JOIN telepulesgps t ON h.gpsid = t.id
+ORDER BY a.nev ASC;
+
+12. A nagy kiterjedésű tavak partján több település van. Határozza meg lekérdezés segítségével azokat a tavakat, amelyekhez legalább 3 település tartozik! A listában a tavak neve és a települések száma jelenjen meg! (5sok)
+SELECT a.nev, COUNT(h.gpsid) AS telepules_db FROM alloviz a
+INNER JOIN helykapcs h ON a.id = h.allovizid
+GROUP BY a.id, a.nev 
+HAVING COUNT(h.gpsid) >= 3;
+
+
+13. Csak a morotvató típusú tavak közül keressük azokat, amelyekhez legalább 2 település tartozik.
+SELECT a.nev, COUNT(h.gpsid) AS telepules_db FROM alloviz a
+INNER JOIN helykapcs h ON a.id = h.allovizid
+WHERE a.tipus = 'morotvató'
+GROUP BY a.id, a.nev
+HAVING COUNT(h.gpsid) >= 2;
+
+14. Listázd ki azokat a tó-típusokat (tipus), amelyekből összesen legalább 4 különböző állóvíz szerepel az adatbázisban! A listában jelenjen meg a típus neve és az állóvizek darabszáma (db). 
+SELECT tipus, COUNT(id) AS db FROM alloviz 
+WHERE tipus IS NOT NULL
+GROUP BY tipus
+HAVING COUNT(id) >= 4;
+
+15. Listázd ki az összes állóvíz nevét (nev) és a hozzájuk kapcsolódó települések nevét, beleértve azokat az állóvizeket is, amelyekhez egyetlen település sincs hozzárendelve a helykapcs / telepulesgps táblában! (left join)
+SELECT a.nev AS alloviz_nev, t.nev AS telepules_nev FROM alloviz a
+LEFT JOIN helykapcs h ON a.id = h.allovizid
+LEFT JOIN telepulesgps t ON h.gpsid = t.id;
+
+16. Listázd ki az összes település nevét (telepulesgps) és a hozzájuk tartozó állóvizek nevét, úgy is, hogy azok a települések is megjelenjenek, amelyekhez egyetlen állóvíz sincs kapcsolva!
+SELECT t.nev AS telepules_nev, a.nev AS alloviz_nev FROM telepulesgps t
+LEFT JOIN helykapcs h ON t.id = h.gpsid
+LEFT JOIN alloviz a ON h.allovizid = a.id;
+ 
+17. Listázd ki azoknak az állóvizeknek a nevét és területét, amelyeknek területe nagyobb, mint az összes állóvíz átlagos területe! (beágyazott lekérdezéssel)
+SELECT nev, terulet FROM alloviz 
+WHERE terulet > (SELECT AVG(terulet) FROM alloviz);
+
